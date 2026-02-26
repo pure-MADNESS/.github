@@ -71,6 +71,8 @@ Each node features an **Ergodic Supervisor** that monitors the "statistical heal
 
 The idea is to keep a stabilized energy providence to the house consume.
 
+This feature allows the environment to consider also the weather forecasts: the ergodic feedback is based on a past window until the current time step, but it can be expanded to consider a future window.
+
 ---
 
 ## System Logic Flow
