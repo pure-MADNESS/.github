@@ -19,10 +19,8 @@ The system is modeled as a collection of independent nodes communicating via a p
 
 The control loop follows a three-stage pipeline:
 
-### 1. Local State Estimation (Delayed-State EKF)
-Each generation and storage node runs a local **Extended Kalman Filter (EKF)** to estimate power output.
-* **Delayed-State Logic:** To handle real-world hardware constraints like communication latency or asynchronous sensor data, the EKF maintains a buffer of past states to integrate delayed measurements correctly.
-* **Adaptive Confidence:** Inspired by automotive slip-control systems, the filter dynamically adjusts its trust in sensors based on the environmental conditions.
+### 1. Local State Estimation (EKF)
+Each generation and storage node runs a local **Extended Kalman Filter (EKF)** to estimate power output. Inspired by automotive slip-control systems, the filter dynamically adjusts its trust in sensors based on the environmental conditions.
 
 ### 2. Multi-Layered Consensus Protocol
 Nodes reach a shared "Global Truth" via the **MADS**.
@@ -80,7 +78,7 @@ This feature allows the environment to consider also the weather forecasts: the 
 The following flow describes the interaction between local estimation and global coordination:
 
 1.  **Sensors** → Local readings provided to the node.
-2.  **Delayed-State EKF** → Filters noise and handles asynchronous data.
+2.  **EKF** → Filters noise and handles asynchronous data.
 3.  **Ergodic Supervisor** → Analyzes sensor history and adjusts the **R Matrix** (Confidence).
 4.  **Consensus Layer 1** → Nodes exchange $(P, \sigma^2)$ to agree on total available energy.
 5.  **Consensus Layer 2** → Nodes agree on the final power distribution (House vs. Storage).
@@ -112,7 +110,7 @@ The following tests are performed to stress-test the **Ergodic Supervisor** and 
 
 #### 1. Sensor Noise & EKF Robustness
 * **Action:** Introducing high-frequency electrical noise by manually jittering the potentiometers.
-* **Expected Result:** The **Delayed-State EKF** should maintain a stable power estimate, filtering out transient spikes while updating the state covariance.
+* **Expected Result:** The **EKF** should maintain a stable power estimate, filtering out transient spikes while updating the state covariance.
 
 #### 2. Non-Ergodic Fault Injection (The "Broken Blade" Scenario)
 * **Action:** Abruptly changing the potentiometer value to a state that contradicts the natural resource profile (e.g., zero RPM during high wind simulation).
