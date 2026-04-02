@@ -122,6 +122,7 @@ The following tests are performed to stress-test the **Ergodic Supervisor** and 
 
 ### Telemetry and Data Flow
 The experimental data flow follows this path:
+`Physical Potentiometer` → `ADS1115 (ADC)` → `I2C Bus` → `Raspberry Pi (EKF + Ergodic Logic)` → `MADS Network (TCP/IP)` → `Global Consensus Result`.
 
 ### .ini Configuration file example
 ```
@@ -179,4 +180,4 @@ relative_tol = 1e-4
 absolute_tol = 1e-5
 hmin_tol = 1e-10
 ```
-`Physical Potentiometer` → `ADS1115 (ADC)` → `I2C Bus` → `Raspberry Pi (EKF + Ergodic Logic)` → `MADS Network (TCP/IP)` → `Global Consensus Result`.
+
