@@ -122,4 +122,61 @@ The following tests are performed to stress-test the **Ergodic Supervisor** and 
 
 ### Telemetry and Data Flow
 The experimental data flow follows this path:
+
+### .ini Configuration file example
+```
+[forecast_agent]
+pub_topic = "forecast"
+
+[test_filter]
+sub_topic = "forecast"
+
+[wind_agent_1]
+pub_topic = "source_wind_1"
+sub_topic = ["omega_1", "forecast", "load_1", "load_2", "load_3", "source_wind_2", "source_wind_3", "hydro_agent_1"]
+
+[wind_agent_2]
+pub_topic = "source_wind_2"
+sub_topic = ["omega_1", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_3", "hydro_agent_1"]
+
+[wind_agent_3]
+pub_topic = "source_wind_3"
+sub_topic = ["omega_3", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_2", "hydro_agent_1"]
+
+[hydro_agent_1]
+pub_topic = "source_hydro_1"
+sub_topic = ["omega_4", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_2", "source_wind_3"]
+
+[load_agent_1]
+pub_topic = "load_1"
+sub_topic = ["forecast", "load_3", "load_2", "source_wind_1", "source_wind_2", "source_wind_3", "hydro_agent_1"]
+
+[load_agent_2]
+pub_topic = "load_2"
+sub_topic = ["forecast", "load_1", "load_3", "source_wind_1", "source_wind_2", "source_wind_3", "hydro_agent_1"]
+
+[load_agent_3]
+pub_topic = "load_3"
+sub_topic = ["forecast", "load_1", "load_2", "source_wind_1", "source_wind_2", "source_wind_3", "hydro_agent_1"]
+
+[rerunner]
+sub_topic = "source_wind_1"
+ketypaths = ["source_wind_1/state/proposed_power", "source_wind_1/state/covariance", "source_wind_1/state/p_max"]
+
+[fmu_wind_turbine]
+period = 100
+pub_topic = "omega_1"
+sub_topic = "source_wind_1"
+relative_tol = 1e-4
+absolute_tol = 1e-5
+hmin_tol = 1e-10
+
+[fmu_hydro_plant]
+period = 100
+pub_topic = "omega_4"
+sub_topic = ["source_hydro_1"]
+relative_tol = 1e-4
+absolute_tol = 1e-5
+hmin_tol = 1e-10
+```
 `Physical Potentiometer` → `ADS1115 (ADC)` → `I2C Bus` → `Raspberry Pi (EKF + Ergodic Logic)` → `MADS Network (TCP/IP)` → `Global Consensus Result`.
