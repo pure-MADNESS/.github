@@ -131,39 +131,47 @@ pub_topic = "forecast"
 
 [wind_agent_1]
 pub_topic = "source_wind_1"
-sub_topic = ["omega_1", "forecast", "load_1", "load_2", "load_3", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
+sub_topic = ["omega_1", "forecast", "load_1", "load_2", "load_3", "load_4", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
 
 [wind_agent_2]
 pub_topic = "source_wind_2"
-sub_topic = ["omega_1", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
+sub_topic = ["omega_1", "load_1", "load_2", "load_3", "load_4", "forecast", "source_wind_1", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
 
 [wind_agent_3]
 pub_topic = "source_wind_3"
-sub_topic = ["omega_3", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_2", "source_hydro_1", "source_solar_1", "accumulator_1"]
+sub_topic = ["omega_3", "load_1", "load_2", "load_3", "load_4", "forecast", "source_wind_1", "source_wind_2", "source_hydro_1", "source_solar_1", "accumulator_1"]
 
 [hydro_agent_1]
 pub_topic = "source_hydro_1"
-sub_topic = ["omega_4", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_2", "source_wind_3", "source_solar_1", "accumulator_1"]
+sub_topic = ["omega_4", "load_1", "load_2", "load_3", "load_4", "forecast", "source_wind_1", "source_wind_2", "source_wind_3", "source_solar_1", "accumulator_1"]
 
 [solar_agent_1]
 pub_topic = "source_solar_1"
-sub_topic = ["dc", "load_1", "load_2", "load_3", "forecast", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "accumulator_1"]
+sub_topic = ["dc", "load_1", "load_2", "load_3", "load_4", "forecast", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "accumulator_1"]
 
 [load_agent_1]
+socialism = true
 pub_topic = "load_1"
-sub_topic = ["forecast", "load_3", "load_2", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
+sub_topic = ["forecast", "load_3", "load_2", "load_4", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
 
 [load_agent_2]
+socialism = true
 pub_topic = "load_2"
-sub_topic = ["forecast", "load_1", "load_3", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
+sub_topic = ["forecast", "load_1", "load_3", "load_4", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
 
 [load_agent_3]
+socialism = true
 pub_topic = "load_3"
-sub_topic = ["forecast", "load_1", "load_2", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
+sub_topic = ["forecast", "load_1", "load_2", "load_4", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
+
+[load_agent_4]
+socialism = true
+pub_topic = "load_4"
+sub_topic = ["forecast", "load_1", "load_2", "load_3", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1", "accumulator_1"]
 
 [accumulator_1]
 pub_topic = "accumulator_1"
-sub_topic = ["forecast", "load_1", "load_2", "load_3", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1"]
+sub_topic = ["forecast", "load_1", "load_2", "load_3", "load_4", "source_wind_1", "source_wind_2", "source_wind_3", "source_hydro_1", "source_solar_1"]
 
 
 [rerunner]
