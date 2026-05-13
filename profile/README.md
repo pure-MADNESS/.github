@@ -1,6 +1,6 @@
 # MADNESS (MADs - Natural Energy Scheduling System)
 
-A decentralized energy management system (EMS) for rural off-grid habitations. This project implements a multi-layered distributed architecture using **C++** and the **MADS** framework to manage diverse energy sources, storage systems, and domestic loads through advanced state estimation and cooperative control.
+A decentralized energy management system for rural off-grid habitations. This project implements a multi-layered distributed architecture using **C++** and **MADS** framework to manage energy sources, storage systems, and domestic loads through distributed state estimation and cooperative control.
 
 ---
 
@@ -9,9 +9,9 @@ A decentralized energy management system (EMS) for rural off-grid habitations. T
 The system is modeled as a collection of independent nodes communicating via a peer-to-peer network. There is no central master controller; the global power balance emerges from local estimation and collective consensus.
 
 ### Node Types
-* **Load Node (The House):** Monitors domestic consumption in real-time.
-* **Generation Nodes:** Variable sources including Solar (PV), Wind (Turbines), and Hydro (Small-scale stream).
-* **Storage Node:** Pumped-hydro storage (PHS) or battery systems acting as an energy buffer.
+* **Load Node (The House):** Monitors domestic consumption in real-time and provides user's strategy.
+* **Generation Nodes:** Variable sources including Solar (PV), Wind (Turbines), and Hydro.
+* **Storage Node:** Battery systems acting as an energy buffer.
 
 ---
 
@@ -27,10 +27,10 @@ Nodes reach a shared "Global Truth" via the **MADS**.
 
 #### Layer A: Perception Consensus (Supply Estimation)
 Nodes broadcast their estimated power ($P_i$) and uncertainty ($\sigma_i^2$).
-* **Goal:** Agreement on the total available energy ($P_{total}$) in the micro-grid.
+* **Goal:** Agreement on the total available energy ($P_{total}$) and total weight ($W_{tot}$) in the grid.
 
 #### Layer B: Control Consensus (Distributed Dispatching)
-Once $P_{total}$ is known, nodes negotiate **how** to distribute the power. This is not a simple 50/50 split; it is an optimization based on **Variance-Aware Dispatching**:
+Once $P_{total}$ is known, nodes negotiate **how** to distribute the power. This is not a simple 50/50 split; it is a distributed weighted estimation of the total grid power that must balance the request:
 
 * **Priority Routing:** The "House" requires stable, high-quality power. The "Storage" (pumping water) is resilient to fluctuations.
   
@@ -50,7 +50,7 @@ In a surplus scenario, the system performs a "Quality-of-Source" partitioning. I
     3.  **Surplus Diversion:** Any remaining power $P_{storage,i} = P_{est,i} - P_{house,i}$ is automatically routed to the storage actuators.
    
 * **Deficit Logic ($P_{total} < P_{house}$):**
-    * The Storage Node joins the consensus to provide the missing power ($P_{gap}$). If multiple storage units exist, they negotiate based on their **State of Charge (SoC)** to maintain ergodic balance across the battery/reservoir bank.
+    * The Storage Node joins the consensus to provide the missing power ($P_{gap}$). If multiple storage units exist, they negotiate based on their **State of Charge (SoC)** to maintain ergodic balance across the battery/reservoir bank. If the accumulator is not enough, then it is assumed to fetch power from the public grid.
 ---
 
 ## Ergodic Supervision and Adaptive R-Matrix
@@ -73,56 +73,13 @@ This feature allows the environment to consider also the weather forecasts: the 
 
 ---
 
-## System Logic Flow
+## Github Organization Structure
+The organization contains all the used code. Agents (like energy sources: `wind_agent`, `hydro_agent`, `solar_agent`) have their own source code that born as a MADS plugin. The same goes for the `load_agent` that is the user-side interface.
+All agents include some fundamental libraries:
 
-The following flow describes the interaction between local estimation and global coordination:
-
-1.  **Sensors** → Local readings provided to the node.
-2.  **EKF** → Filters noise and handles asynchronous data.
-3.  **Ergodic Supervisor** → Analyzes sensor history and adjusts the **R Matrix** (Confidence).
-4.  **Consensus Layer 1** → Nodes exchange $(P, \sigma^2)$ to agree on total available energy.
-5.  **Consensus Layer 2** → Nodes agree on the final power distribution (House vs. Storage).
-6.  **Actuators** → Turbines and pumps adjust their physical state based on the consensus.
-
----
-
-## Tech Stack
-* **C++20**: Core logic and high-performance matrix math.
-* **Eigen Library**: For EKF matrix operations and linear algebra.
-* **MADS Framework**: For decentralized process communication.
-
-## Practical Tests
-
-## Experimental Validation
-
-To validate the decentralized logic, the system is tested using a distributed hardware testbed. This setup moves beyond pure simulation by introducing real-world electronic noise, communication latency, and physical stochasticity.
-
-### Hardware Setup
-The testbed consists of multiple independent nodes connected via a local network:
-* **Sensor Nodes (Raspberry Pi):** Each Pi represents a generation node (Wind, Solar, or Hydro). 
-    * **Source Emulation:** Breadboard-mounted potentiometers are used to simulate real-time physical inputs (e.g., turbine RPM, solar irradiance, or water flow pressure).
-    * **Data Acquisition:** Analog signals are processed through an **ADS1115 (16-bit ADC)** via I2C to introduce realistic quantization noise and sampling jitter.
-* **Central Monitor & Load Node (PC/Laptop):** Acts as the "House" node and runs the global telemetry dashboard to monitor consensus convergence.
-
-
-### Test Scenarios
-The following tests are performed to stress-test the **Ergodic Supervisor** and the **Consensus Layers**:
-
-#### 1. Sensor Noise & EKF Robustness
-* **Action:** Introducing high-frequency electrical noise by manually jittering the potentiometers.
-* **Expected Result:** The **EKF** should maintain a stable power estimate, filtering out transient spikes while updating the state covariance.
-
-#### 2. Non-Ergodic Fault Injection (The "Broken Blade" Scenario)
-* **Action:** Abruptly changing the potentiometer value to a state that contradicts the natural resource profile (e.g., zero RPM during high wind simulation).
-* **Expected Result:** The **Ergodic Supervisor** detects a high Sobolev distance ($\mathcal{E}$), triggers a $K_{ergodic}$ penalty, and inflates the $R$ matrix. The node's weight in the **Control Consensus** should drop significantly, isolating the faulty source.
-
-#### 3. Network Resilience & Latency
-* **Action:** Simulating network congestion or physically disconnecting a Raspberry Pi.
-* **Expected Result:** **MADS** must handle packet loss. The remaining nodes must re-negotiate the power dispatching in Layer 2 to compensate for the missing source, ensuring the "House" demand is still met.
-
-### Telemetry and Data Flow
-The experimental data flow follows this path:
-`Physical Potentiometer` → `ADS1115 (ADC)` → `I2C Bus` → `Raspberry Pi (EKF + Ergodic Logic)` → `MADS Network (TCP/IP)` → `Global Consensus Result`.
+* `negotiator_lib`: this is the library devoted to the distributed balance between energy sources whose distributed power is the balance of the total load request;
+* `socialist_lib`: this is the library shared between loads that help to optimize loads' power requests;
+* `ekf_lib`: it implements a virtual class `EKF` that implements the base functions such as the prediction and the correction, based on generic variables that are defined in a second moment in each specific agent by means of inheritance.
 
 ### .ini Configuration file example
 ```
